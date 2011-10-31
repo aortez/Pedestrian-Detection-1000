@@ -4,8 +4,6 @@
 \usepackage{color}
 \usepackage{fancybox}
 \usepackage{listings}
-\usepackage{tikz}
-\usetikzlibrary{arrows,shapes}
 \title{Human Detection with Histograms of Oriented Gradients\\
        Proposal}
 \author{Allan Ortiz and Bradley Seefield\\
@@ -15,24 +13,78 @@
 \maketitle
 
 \section{Introduction} %A brief description of what you plan to do and your goals
-We plan to implement a grid based ``histogram of oriented gradients'' human detector \cite{dalal05}.
+According to \emph{Dalal et. al.}\cite{dalal05} locally normalized histogram of gradient orientations in 
+a dense overlapping grid provides higher performance and a lower rate of false positives than (at the time)
+existing feature sets for detecting humans from images. In their study they experimented 
+with different parameters and found that fine-scale gradients, fine orientation binning, 
+relatively course spatial binning, and high-quality local contrast normalization in 
+overlapping descriptor blocks are most suitable.
+
+The general algorithm is composed of the following steps:
+\begin{enumerate}
+  \item Input image
+  \item Normalize gamma and colour 
+  \item Compute gradients
+  \item Weighted vote into spatial and orientation cells
+  \item Contrast normalize over overlapping spatial blocks
+  \item Collect HOG’s over detection window
+  \item Linear SVM
+  \item Person / non−person classification
+\end{enumerate}
+
+In the referenced paper, the authors refer to the set of parameters/methods that produce 
+optimal performance as their ``default detector'', which has the following properties:
+\begin{itemize}
+  \item RGB color space with no gamma correction
+  \item $[-1, 0, 1]$ gradient filter with no smoothing
+  \item linear gradient voting into 9 orientation bins in 0-180 degrees
+  \item 16x16 pixel blocks of four 8x8 cells
+  \item Gaussian spatial window with $\alpha = 8$ pixels
+  \item Lowe-style clipped L2 norm block normalization
+  \item Block spacing stride of 8 pixels
+  \item 64x128 detection window
+  \item linear SVM classifier
+\end{itemize}
 
 \section{Inputs and Outputs}
-·         The input and output for the application
-\section{Metrics}
-·         How you will evaluate the project
-\section{Schedule}
-·         A schedule of work, including what you plan to submit for the design/prototype
-\section{Resources}
-·         Any publicly available code and/or data that you plan to use (not binding, but should be noted)
+The input to the algorithm will be the two data-sets referenced in the original paper: 
+The MIT pedestrian database (509 training and 200 test images of pedestrians) as well 
+as the more difficult INRIA data-set (1,805 64x128 images).
 
+The SVM will be trained with 1,239 of these images and their left-right reflections as positive training examples,
+yeilding a total 2,478 positive training images. 1,218 human-free images will used as a negative training set.
 
- \begin{thebibliography}{1}
+The output of the algorithm is a per image classification of human/non-human.
 
-  \bibitem{dalal05} Navneet Dalal and Bill Triggs, {\em Histograms of Oriented
-  Gradients for Human Detection} 2005.
+\section{Metrics} % How you will evaluate the project
+The project will be a success if we are able to mimic the results found by \emph{Dalal et. al.} 
+We will not be testing all the permutations that they did, but rather the permutation 
+(described above) that yielded the best results with $84\%$ at $10^{-4}$ false positives per window.
 
-  \end{thebibliography}
+\section{Schedule} % A schedule of work, including what you plan to submit for the design/prototype
+\begin{tabular}{|l|l|}
+\hline
+Date Range & Task \\
+\hline
+Oct 31 - Nov  7 & Produce rough documentation of each step of algorithm \\
+Nov  8 - Nov 14 & Produce design suitable for class presentation \\
+Nov 15 - Nov 28 & Implement algorithm \\
+Nov 29 - Dec  5 & Conduct experiment \\
+Dec  6 - Dec 12 & Formalized and report results \\
+\hline
+\end{tabular}
+
+\section{Resources} %  Any publicly available code and/or data that you plan to use (not binding, but should be noted)
+MIT Pedestrian database: http://cbcl.mit.edu/software-datasets/PedestrianData.html \\
+INRIA data-set: http://pascal.inrialpes.fr/data/human/ \\
+SVM Light: http://svmlight.joachims.org/ \\
+
+\begin{thebibliography}{1}
+
+  \bibitem{dalal05} N. Dalal and B. Triggs. Histograms of oriented gradients for human detection. 
+  In CVPR, pages I: 886–893, 2005.
+
+\end{thebibliography}
 
 
 \end{document}
