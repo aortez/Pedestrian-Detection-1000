@@ -106,6 +106,11 @@ bool containsPerson( const Mat& src )
         }
     }
 
+    // TODO: create image in which each cell is depicted as a collection of lines originating from the center
+    // of the cell in the direction of each gradient bins, each line having an intensity equal to numPixelsPerCell / binCount
+    // this will allow us to visually verify that the HOG computation is working correctly, and then we can reuse
+    // the method for creating image later to view the effects of normalization
+
     show( bwSrc, "bwSrc" );
     show( gradient_horz, "hgrad" );
     show( gradient_vert, "vgrad" );
