@@ -25,9 +25,6 @@ void show( const Mat& img, const string& windowName )
     imshow( windowName.c_str(), img );
 }
 
-/**
- * Entry point to app. Loads image from file system and feeds it through the algorithm.
- */
 int main( int argc, const char* argv[] )
 {
 
@@ -73,7 +70,37 @@ bool containsPerson( const Mat& src )
                 const double mag = sqrt( v * v + h * h );
                 orientation.at< double >( y, x ) = angle;
                 magnitude.at< double >( y, x ) = mag;
-                printf( "@(%d,%d): (h,v) = (%f, %f), angle = %f, magnitude = %f\n", x, y, h, v, angle, mag );
+//                printf( "@(%d,%d): (h,v) = (%f, %f), angle = %f, magnitude = %f\n", x, y, h, v, angle, mag );
+            }
+        }
+    }
+
+    // create a histogram for each cell...
+    const int cellWidth = 2;
+    const int cellHeight = 2;
+    const int numBins = 9;
+
+    // create grid of cells
+    const int gridWidth = src.cols / cellWidth;
+    const int gridHeight = src.rows / cellHeight;
+    printf( "(gridWidth, gridHeight) = (%d,%d)\n", gridWidth, gridHeight );
+    int cellHistogram[ gridWidth ][ gridHeight ][ numBins ];
+    memset( cellHistogram, 0, gridWidth * gridHeight * numBins * sizeof( int ) );
+    for ( int gridY = 0; gridY < gridHeight; gridY++ )
+    {
+        for ( int gridX = 0; gridX < gridWidth; gridX++ )
+        {
+            for ( int cellY = 0; cellY < cellHeight; cellY++ )
+            {
+                for ( int cellX = 0; cellX < cellWidth; cellX++ )
+                {
+                    const int pixelX = gridX * cellWidth + cellX;
+                    const int pixelY = gridY * cellHeight + cellY;
+                    const double pixelAngle = orientation.at< double >( pixelY, pixelX );
+                    const double pixelWeight = magnitude.at< double >( pixelY, pixelX );
+                    const int binIndex = static_cast<int>( round( 2 * CV_PI / numBins * pixelAngle ) );
+                    cellHistogram[ cellX ][ cellY ][ binIndex ] += pixelWeight;
+                }
             }
         }
     }
