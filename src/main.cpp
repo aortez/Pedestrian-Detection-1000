@@ -98,7 +98,8 @@ bool containsPerson( const Mat& src )
                     const int pixelY = gridY * cellHeight + cellY;
                     const double pixelAngle = orientation.at< double >( pixelY, pixelX );
                     const double pixelWeight = magnitude.at< double >( pixelY, pixelX );
-                    const int binIndex = static_cast<int>( round( 2 * CV_PI / numBins * pixelAngle ) );
+                    const int binIndex = static_cast<int>( round( abs( pixelAngle ) / ( CV_PI ) * numBins ) );
+//                    printf( "angle: %f, binIndex: %d\n", pixelAngle, binIndex );
                     cellHistogram[ cellX ][ cellY ][ binIndex ] += pixelWeight;
                 }
             }
