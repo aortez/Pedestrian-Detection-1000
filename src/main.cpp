@@ -1,3 +1,4 @@
+#include <CImg.h>
 #include <cstdio>
 #include <cv.h>
 #include <highgui.h>
@@ -5,6 +6,7 @@
 #include <sstream>
 using namespace cv;
 using namespace std;
+using namespace cimg_library;
 
 
 bool containsPerson( const Mat& img );
@@ -84,41 +86,49 @@ bool containsPerson( const Mat& src )
     const int gridWidth = src.cols / cellWidth;
     const int gridHeight = src.rows / cellHeight;
     printf( "(gridWidth, gridHeight) = (%d,%d)\n", gridWidth, gridHeight );
-    int cellHistogram[ gridWidth ][ gridHeight ][ numBins ];
-    memset( cellHistogram, 0, gridWidth * gridHeight * numBins * sizeof( int ) );
-    for ( int gridY = 0; gridY < gridHeight; gridY++ )
+    CImg< double > cellHistogram( gridWidth, gridHeight, numBins, 1, 0 );
+    cimg_forXY( cellHistogram, gridX, gridY )
     {
-        for ( int gridX = 0; gridX < gridWidth; gridX++ )
+        for ( int cellY = 0; cellY < cellHeight; cellY++ )
         {
-            for ( int cellY = 0; cellY < cellHeight; cellY++ )
+            for ( int cellX = 0; cellX < cellWidth; cellX++ )
             {
-                for ( int cellX = 0; cellX < cellWidth; cellX++ )
-                {
-                    const int pixelX = gridX * cellWidth + cellX;
-                    const int pixelY = gridY * cellHeight + cellY;
-                    const double pixelAngle = orientation.at< double >( pixelY, pixelX );
-                    const double pixelWeight = magnitude.at< double >( pixelY, pixelX );
-                    const int binIndex = static_cast<int>( round( abs( pixelAngle ) / ( CV_PI ) * numBins ) );
-//                    printf( "angle: %f, binIndex: %d\n", pixelAngle, binIndex );
-                    cellHistogram[ cellX ][ cellY ][ binIndex ] += pixelWeight;
-                }
+                const int pixelX = gridX * cellWidth + cellX;
+                const int pixelY = gridY * cellHeight + cellY;
+                const double pixelAngle = orientation.at< double >( pixelY, pixelX );
+                const double pixelWeight = magnitude.at< double >( pixelY, pixelX );
+                const int binIndex = static_cast<int>( round( abs( pixelAngle ) / ( CV_PI ) * (numBins - 1) ) );
+                printf( "angle: %f, binIndex: %d, pixelWeight: %f\n", pixelAngle, binIndex, pixelWeight );
+                assert( binIndex < numBins );
+                assert( gridX < gridWidth );
+                assert( gridY < gridHeight );
+
+                cellHistogram( gridX, gridY, binIndex ) += pixelWeight;
             }
         }
     }
 
-    // TODO: create image in which each cell is depicted as a collection of lines originating from the center
-    // of the cell in the direction of each gradient bins, each line having an intensity equal to numPixelsPerCell / binCount
-    // this will allow us to visually verify that the HOG computation is working correctly, and then we can reuse
-    // the method for creating image later to view the effects of normalization
+    CImgList< double > slices;
+    cimg_forZ( cellHistogram, z )
+    {
+        slices.insert( cellHistogram.get_slice( z ), z );
+    }
+    slices.display();
+
 
     show( bwSrc, "bwSrc" );
     show( gradient_horz, "hgrad" );
     show( gradient_vert, "vgrad" );
     show( orientation, "orientation" );
     show( magnitude, "magnitude" );
-    waitKey();
 
-    // Histograms -- Orientation Binning
+    // TODO: create image in which each cell is depicted as a collection of lines originating from the center
+    // of the cell in the direction of each gradient bins, each line having an intensity equal to numPixelsPerCell / binCount
+    // this will allow us to visually verify that the HOG computation is working correctly, and then we can reuse
+    // the method for creating image later to view the effects of normalization
+
+
+    waitKey();
 
     // Descriptor Blocks
 
