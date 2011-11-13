@@ -9,6 +9,8 @@ using namespace std;
 using namespace cimg_library;
 
 
+//const char* INPUT_IMAGE = "test.png";
+
 bool containsPerson( const Mat& img );
 
 string toString( const Mat& img )
@@ -30,8 +32,8 @@ void show( const Mat& img, const string& windowName )
 int main( int argc, const char* argv[] )
 {
 
-    Mat src = imread( "test.png" );
-//    Mat src = imread( argv[ 1 ] );
+//    Mat src = imread( INPUT_IMAGE );
+    Mat src = imread( argv[ 1 ] );
 
     cout << "Is a person: " << boolalpha << containsPerson( src ) << endl;
     return 0;
@@ -78,8 +80,8 @@ bool containsPerson( const Mat& src )
     }
 
     // create a histogram for each cell...
-    const int cellWidth = 2;
-    const int cellHeight = 2;
+    const int cellWidth = 6;
+    const int cellHeight = 6;
     const int numBins = 9;
 
     // create grid of cells
