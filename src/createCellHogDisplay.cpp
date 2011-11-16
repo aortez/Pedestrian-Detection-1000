@@ -4,7 +4,7 @@ using namespace cimg_library;
 
 CImg< double > createCellHogDisplay( const CImg< double >& cells )
 {
-    const int displayWidth = 10;
+    const int displayWidth = 20;
     const double lineRadius = displayWidth * 0.40;
     const int numBins = cells.depth();
 
