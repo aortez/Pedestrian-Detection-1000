@@ -1,9 +1,0 @@
-1. RGB color space with no gamma correction
-2. [-1, 0, 1] gradient filter with no smoothing
-3. linear gradient voting into 9 orientation bins in 0-180 degrees
-   16x16 pixel blocks of four 8x8 cells
-   Gaussian spatial window with alpha = 8 pixels
-4. Lowe-style clipped L2 norm block normalization
-   Block spacing stride of 8 pixels
-5. 64x128 detection window
-6. linear SVM classifier

@@ -11,6 +11,8 @@ public:
 
     Cell& cell( int x, int y );
 
+    cv::Mat createHogImage( void );
+
     int dimX(void) const;
 
     int dimY(void) const;

@@ -1,3 +1,4 @@
+#include <UnitTest++.h>
 #include <CImg.h>
 #include <cstdio>
 #include <cv.h>
@@ -28,7 +29,14 @@ int main( int argc, const char* argv[] )
     Mat src;
     if( argc > 1 )
     {
-        src = imread( argv[ 1 ] );
+        if ( argv[ 1 ] == string( "-test" ) )
+        {
+            return UnitTest::RunAllTests();
+        }
+        else
+        {
+            src = imread( argv[ 1 ] );
+        }
     }
     else
     {
