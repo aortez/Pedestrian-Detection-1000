@@ -16,18 +16,28 @@ void Cell::addPixel( const double angle, const double weight )
     mSampleSum += weight;
 }
 
-int Cell::angleToBinIndex( const double angle, const int numBins, const bool shouldIgnoreSign )
+int Cell::angleToBinIndex( double angle, const int numBins, const bool shouldIgnoreSign )
 {
+    printf( "angle: %f\n", angle );
+    assert( angle >= -CV_PI && angle <= CV_PI );
+    // input angle is [-pi,+pi]
+
     // normalize to [0,1]
     double normalizedAngle;
     if( shouldIgnoreSign )
     {
+        // if negative, then map into positive range [0,pi]
+        if ( angle < 0 ) angle += CV_PI;
+        // scale from [0,pi] -> [0,1]
         normalizedAngle = angle / CV_PI;
     }
     else
     {
-        normalizedAngle = angle / ( CV_PI * 2 );
+        // scale to [-0.5,0.5] and shift into [0,1]
+        normalizedAngle = angle / ( 2 * CV_PI ) + 0.5;
     }
+    printf( "normlized angle: %f\n", normalizedAngle );
+    assert( normalizedAngle >= 0 && normalizedAngle <= 1 );
 
     // compute bin index
     const int binIndex = static_cast< int >( round( normalizedAngle * ( numBins - 1 ) ) );
@@ -50,19 +60,20 @@ double Cell::binAngle( int binIndex ) const
 
 double Cell::binIndexToAngle( const int binIndex, const int numBins, const bool shouldIgnoreSign )
 {
-    // convert to normalized angle [ 0, 1 ]
+    // convert to normalized angle [0, 1]
     const double normalizedAngle = binIndex / ( numBins - 1.0 );
+    assert( normalizedAngle >= 0 && normalizedAngle <= 1.0 );
 
     double angle;
     if( shouldIgnoreSign )
     {
-        // map into [ 0, pi ]
+        // map into [0, pi]
         angle = normalizedAngle * CV_PI;
     }
     else
     {
-        // map into [ -pi, +pi ]
-        angle = ( normalizedAngle - 0.5 ) * CV_PI;
+        // map into [-pi, +pi]
+        angle = ( normalizedAngle - 0.5 ) * CV_PI * 2;
     }
 
     return angle;
@@ -78,24 +89,3 @@ int Cell::numBins( void ) const
 {
     return mBins.size();
 }
-
-double Cell::vecToAngle( const cv::Vec2d& vec, const bool shouldIgnoreSign )
-{
-    // compute angle in [ -pi, +pi ]
-    double angle = atan2( vec[ 0 ], vec[ 1 ] );
-
-    if( shouldIgnoreSign )
-    {
-        // convert into [ 0, pi ], mapping negative angles into positive range
-        ( angle < 0 ) ? angle += CV_PI : angle;
-        assert( angle >= 0 && angle <= CV_PI );
-    }
-    else
-    {
-        // translate into [ 0, 2 * pi ]
-        angle += CV_PI;
-    }
-
-    return angle;
-}
-

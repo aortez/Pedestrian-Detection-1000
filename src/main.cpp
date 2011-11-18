@@ -7,7 +7,6 @@
 #include <sstream>
 #include "Cell.h"
 #include "Grid.h"
-#include "createCellHogDisplay.h"
 using namespace cv;
 using namespace std;
 using namespace cimg_library;

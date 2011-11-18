@@ -23,9 +23,6 @@ public:
     //! Returns the number of bins in the cell.
     int numBins( void ) const;
 
-    //! Converts a 2d vector into an angle.
-    static double vecToAngle( const cv::Vec2d& vec, bool shouldIgnoreSign );
-
 protected:
     //! Converts an angle to a bin index.
     static int angleToBinIndex( double angle, int numBins, bool shouldIgnoreSign );

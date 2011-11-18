@@ -11,7 +11,7 @@ public:
 
     Cell& cell( int x, int y );
 
-    cv::Mat createHogImage( void );
+    cv::Mat createHogImage( cv::Mat bwSrc );
 
     int dimX(void) const;
 
@@ -19,5 +19,6 @@ public:
 
 private:
     std::vector< Cell > mCell;
-    cv::Vec2i mDims;
+    cv::Vec2i mCellDims;
+    cv::Vec2i mGridDims;
 };

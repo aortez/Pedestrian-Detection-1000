@@ -3,6 +3,7 @@
 #include <highgui.h>
 #include "Grid.h"
 using namespace cv;
+using namespace std;
 
 void show( const Mat& img, const string& windowName )
 {
@@ -10,10 +11,9 @@ void show( const Mat& img, const string& windowName )
     imshow( windowName.c_str(), img );
 }
 
-Grid::Grid( Mat src, Vec2i cellDims )
+Grid::Grid( Mat src, Vec2i cellDims ) :
+        mCellDims( cellDims )
 {
-//    show( src, "input" );
-
     // TODO: only perform these conversions if the image is not of the correct type(grayscale 64bit float)
     // convert to greyscale
     Mat bwSrc;
@@ -44,7 +44,7 @@ Grid::Grid( Mat src, Vec2i cellDims )
             {
                 const Vec2d vec( gradient_horz.at< double >( y, x ), gradient_vert.at< double >( y, x ) );
                 const double mag = norm( vec );
-                const double angle = Cell::vecToAngle( vec, shouldIgnoreSign );
+                const double angle = atan2( vec[ 1 ], vec[ 0 ] );
                 orientation.at< double >( y, x ) = angle;
                 magnitude.at< double >( y, x ) = mag;
 //                printf( "@(%d,%d): (h,v) = (%f, %f), angle = %f, magnitude = %f\n", x, y, vec[ 0 ], vec[ 1 ], angle, mag );
@@ -53,9 +53,9 @@ Grid::Grid( Mat src, Vec2i cellDims )
     }
 
     // allocate cells
-    mDims[ 0 ] = src.cols / cellDims[ 0 ];
-    mDims[ 1 ] = src.rows / cellDims[ 1 ];
-    mCell.resize( mDims[ 0 ] * mDims[ 1 ], Cell( 9, shouldIgnoreSign ) );
+    mGridDims[ 0 ] = src.cols / mCellDims[ 0 ];
+    mGridDims[ 1 ] = src.rows / mCellDims[ 1 ];
+    mCell.resize( mGridDims[ 0 ] * mGridDims[ 1 ], Cell( 9, shouldIgnoreSign ) );
 
     // bin up weighted angles into histograms
     printf( "(gridWidth, gridHeight) = (%d,%d)\n", dimX(), dimY() );
@@ -67,10 +67,10 @@ Grid::Grid( Mat src, Vec2i cellDims )
             Rect cellRegion( gridX * cellDims[ 0 ], gridY * cellDims[ 1 ], cellDims[ 0 ], cellDims[ 1 ] );
             for( int cellY = 0; cellY < cellDims[ 1 ]; cellY++ )
             {
-                for( int cellX = 0; cellX < cellDims[ 0 ]; cellX++ )
+                for( int cellX = 0; cellX < mCellDims[ 0 ]; cellX++ )
                 {
-                    const int pixelX = gridX * cellDims[ 0 ] + cellX;
-                    const int pixelY = gridY * cellDims[ 1 ] + cellY;
+                    const int pixelX = gridX * mCellDims[ 0 ] + cellX;
+                    const int pixelY = gridY * mCellDims[ 1 ] + cellY;
                     const double pixelAngle = orientation.at< double >( pixelY, pixelX );
                     const double pixelWeight = magnitude.at< double >( pixelY, pixelX );
                     assert( gridX < dimX() && gridX >= 0 );
@@ -87,7 +87,7 @@ Grid::Grid( Mat src, Vec2i cellDims )
     show( orientation.clone() / CV_PI, "orientation" );
     show( magnitude, "magnitude" );
 
-    show( createHogImage(), "HOG" );
+    show( createHogImage( bwSrc ), "HOG" );
 
     waitKey();
 
@@ -105,38 +105,49 @@ Cell& Grid::cell( int x, int y )
     return mCell[ x + y * dimX() ];
 }
 
-Mat Grid::createHogImage( void )
+Mat Grid::createHogImage( Mat bwSrc )
 {
     using namespace cimg_library;
 
-    const double width = 30;
+    const double width = 20;
     const double lineRadius = width;
 
-    CImg< double > hogImage( ( dimX() + 1 ) * width, ( dimY() + 1 ) * width, 1, 1, 0 );
-    for ( int y = 0; y < dimY(); y++ )
+    // copy the Mat image into a CImg
+    CImg< double > hogImage( bwSrc.cols, bwSrc.rows );
+    cimg_forXY( hogImage, x, y )
     {
-        for ( int x = 0; x < dimX(); x++ )
+        hogImage( x, y ) = bwSrc.at< double >( y, x );
+    }
+
+    // resize it
+    hogImage.resize( dimX() * width, dimY() * width, 1, 1, 3 );
+
+
+    for( int y = 0; y < dimY(); y++ )
+    {
+        for( int x = 0; x < dimX(); x++ )
         {
             const Cell& c = cell( x, y );
 
             Vec2d start;
-            start[ 0 ] = x * width + width / 2.0;
-            start[ 1 ] = y * width + width / 2.0;
+            start[ 0 ] = x * width;
+            start[ 1 ] = y * width;
             hogImage( start[ 0 ], start[ 1 ] ) = 1.0;
+            const double color = 1;
 
-            for ( int binIndex = 0; binIndex < c.numBins(); binIndex++ )
+            for( int binIndex = 0; binIndex < c.numBins(); binIndex++ )
             {
                 const double magnitude = c.binNormalized( binIndex );
                 const double angle = c.binAngle( binIndex );
                 Vec2d end;
                 end[ 0 ] = start[ 0 ] + cos( angle ) * magnitude * lineRadius;
                 end[ 1 ] = start[ 1 ] + sin( angle ) * magnitude * lineRadius;
-                const double color = 1;
                 hogImage.draw_arrow( start[ 0 ], start[ 1 ], end[ 0 ], end[ 1 ], &color, 1, 30, -30 );
             }
         }
     }
 
+    // copy to Mat image
     Mat matHogImage( hogImage.height(), hogImage.width(), CV_64F );
     cimg_forXY( hogImage, x, y )
     {
@@ -148,11 +159,11 @@ Mat Grid::createHogImage( void )
 
 int Grid::dimX( void ) const
 {
-    return mDims[ 0 ];
+    return mGridDims[ 0 ];
 }
 
 int Grid::dimY( void ) const
 {
-    return mDims[ 1 ];
+    return mGridDims[ 1 ];
 }
 
