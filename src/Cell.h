@@ -1,12 +1,15 @@
 #pragma once
-#include <cv.h>
 #include <vector>
+namespace cv { struct Mat; }
 
 class Cell
 {
 public:
     //! Constructor.
     Cell( int numBins, bool shouldIgnoreSign );
+
+    //! Bins up an image
+    void addImage( const cv::Mat& src );
 
     //! Adds a pixel to the cell.
     void addPixel( double gradientAngle, double weight );
@@ -19,6 +22,9 @@ public:
 
     //! Gets the normalized [ 0, 1 ] number of votes in the specified bin.
     double binNormalized( int binIndex ) const;
+
+    //! Creates a visual representation of the cell's HOG.
+    cv::Mat drawHOG( int cellScale = 10 ) const;
 
     //! Returns the number of bins in the cell.
     int numBins( void ) const;
@@ -35,4 +41,6 @@ private:
     double mSampleSum;
 
     bool mShouldIgnoreSign;
+
+    cv::Mat mSource;
 };

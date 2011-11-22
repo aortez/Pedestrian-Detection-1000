@@ -6,12 +6,10 @@
 class Grid
 {
 public:
-    Grid( cv::Mat src, cv::Vec2i cellDims );
-    ~Grid();
+    Grid( cv::Mat src, cv::Size cellDims );
+    ~Grid( void );
 
     Cell& cell( int x, int y );
-
-    cv::Mat createHogImage( cv::Mat bwSrc );
 
     int dimX(void) const;
 
@@ -19,6 +17,6 @@ public:
 
 private:
     std::vector< Cell > mCell;
-    cv::Vec2i mCellDims;
-    cv::Vec2i mGridDims;
+    cv::Size mCellDims;
+    cv::Size mGridDims;
 };
