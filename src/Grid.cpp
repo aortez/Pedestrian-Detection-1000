@@ -52,15 +52,7 @@ Grid::Grid( Mat src, Size cellDims ) :
 
             // output cell's hog to ROI
             Mat cellHog = cell( gridX, gridY ).drawHOG( scale );
-            assert( cellOutputRegion.cols == cellHog.cols );
-            assert( cellOutputRegion.rows == cellHog.rows );
-            for ( int y = 0; y < cellHog.rows; y++ )
-            {
-                for ( int x = 0; x < cellHog.cols; x++ )
-                {
-                    cellOutputRegion.at< double >( y, x ) = cellHog.at< double >( y, x );
-                }
-            }
+            cellHog.copyTo( cellOutputRegion );
         }
     }
     show( hog, "hog" );
