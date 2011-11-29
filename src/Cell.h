@@ -26,6 +26,12 @@ public:
     //! Creates a visual representation of the cell's HOG.
     cv::Mat drawHOG( int cellScale = 10 ) const;
 
+    //! Gets the Cell's HOG.
+    const std::vector< double >& getHog( void ) const;
+
+    //! Gets the sum of the cell's votes.
+    double getSum( void ) const;
+
     //! Returns the number of bins in the cell.
     int numBins( void ) const;
 
@@ -33,6 +39,7 @@ protected:
     //! Converts an angle to a bin index.
     static int angleToBinIndex( double angle, int numBins, bool shouldIgnoreSign );
 
+    //! Converts a bin index to an angle.
     static double binIndexToAngle( int binIndex, int numBins, bool shouldIgnoreSign );
 
 private:

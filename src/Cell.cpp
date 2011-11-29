@@ -135,6 +135,16 @@ Mat Cell::drawHOG( int cellScale ) const
     return out;
 }
 
+const vector< double >& Cell::getHog( void ) const
+{
+    return mBins;
+}
+
+double Cell::getSum( void ) const
+{
+    return mSampleSum;
+}
+
 int Cell::numBins( void ) const
 {
     return mBins.size();
