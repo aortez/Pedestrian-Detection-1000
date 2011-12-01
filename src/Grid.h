@@ -6,7 +6,7 @@
 class Grid
 {
 public:
-    Grid( cv::Mat src, cv::Size cellDims );
+    Grid( cv::Mat src, cv::Size cellDims, int numBins );
     ~Grid( void );
 
     Cell& cell( int x, int y );
@@ -25,5 +25,6 @@ private:
     std::vector< Cell > mCell;
     cv::Size mCellDims;
     cv::Size mGridDims;
+    int mNumBins;
     cv::Mat mSource;
 };

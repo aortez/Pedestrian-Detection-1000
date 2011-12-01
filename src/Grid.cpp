@@ -30,8 +30,8 @@ Mat Grid::createHogImage( const int scale )
     return hog;
 }
 
-Grid::Grid( Mat src, Size cellDims ) :
-        mCellDims( cellDims )
+Grid::Grid( Mat src, const Size cellDims, const int numBins ) :
+        mCellDims( cellDims ), mNumBins( numBins )
 {
     // TODO: only perform these conversions if the image is not of the correct type(grayscale 64bit double)
     // convert to greyscale
@@ -44,8 +44,7 @@ Grid::Grid( Mat src, Size cellDims ) :
     mSource = bwSrc;
 
     // populate cells
-    const int numBins = 9;
-    populateCells( numBins );
+    populateCells( mNumBins );
 
     // create hogImage
     show( mSource, "source" );
@@ -73,35 +72,46 @@ Cell& Grid::cell( int x, int y )
 
 vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
 {
-    // allocate memory for descriptor vector
+    // compute range of blocks (by top-left corner)
     const int blockRadius = blockWidth / 2;
-    printf( "blockWidth: %d, blockRadius: %d\n", blockWidth, blockRadius );
     const Range gridRangeX( blockRadius, dimX() - blockRadius );
     const Range gridRangeY( blockRadius, dimY() - blockRadius );
+    printf( "blockWidth: %d, blockRadius: %d\n", blockWidth, blockRadius );
+
+    // allocate memory for descriptor vectors
     const int numCellsPerBlock = blockWidth * blockWidth;
-    vector< Mat > descriptorVectors( gridRangeX.size() * gridRangeY.size(), Mat( numCellsPerBlock, 1, CV_64FC1 ) );
+    vector< Mat > descriptorVectors( gridRangeX.size() * gridRangeY.size(), Mat( numCellsPerBlock * mNumBins, 1, CV_64FC1 ) );
+
+    // visit each block and populate its descriptor vector
     for( int gridY = gridRangeY.start; gridY < gridRangeY.end; gridY++ )
     {
         for( int gridX = gridRangeX.start; gridX < gridRangeX.end; gridX++ )
         {
-            // create the descriptor vector for this block
             const int descriptorVectorIndex = ( gridX - gridRangeX.start ) + ( gridY - gridRangeY.start ) * gridRangeX.size();
             Mat& descriptorVector = descriptorVectors[ descriptorVectorIndex ];
-            descriptorVector = Mat( blockWidth * blockWidth, 1, CV_64FC1 );
-            for( int blockY = 0; blockY < blockWidth; blockY++ )
+            printf( "\nBlock starting @ x,y = (%d,%d)\n", gridX, gridY );
+            // compute the range of cells in the block
+            const Range cellRangeX( gridX - blockRadius, gridX - blockRadius + blockWidth );
+            const Range cellRangeY( gridY - blockRadius, gridY - blockRadius + blockWidth );
+
+            // create the descriptor vector for this block
+            // visit each cell in the block and copy the histogram values into
+            // the descriptor vector
+            for( int descriptorIndex = 0, cellX = cellRangeX.start; cellX < cellRangeX.end; cellX++ )
             {
-                for( int blockX = 0; blockX < blockWidth; blockX++ )
+                for ( int cellY = cellRangeY.start; cellY < cellRangeY.end; cellY++ )
                 {
-                    const int cellX = gridX + blockX - blockRadius;
-                    const int cellY = gridY + blockY - blockRadius;
-                    const double cellSum = cell( cellX, cellY ).getSum();
-                    const int blockIndex = blockX + blockY * blockX;
-                    printf( "cellX,Y: %d, %d, blockIndex: %d\n", cellX, cellY, blockIndex );
-                    descriptorVector.at< double >( blockIndex, 1 ) = cellSum;
+                    for( int i = 0; i < mNumBins; i++, descriptorIndex++ )
+                    {
+                        const double descriptorValue = cell( cellX, cellY ).bin( i );
+                        printf( "\t descriptorIndex: %d, value: %f\n", descriptorIndex, descriptorValue );
+                        descriptorVector.at< double >( descriptorIndex, 1 ) = cell( cellX, cellY ).bin( i );
+                    }
                 }
             }
         }
     }
+    return descriptorVectors;
 }
 
 int Grid::dimX( void ) const

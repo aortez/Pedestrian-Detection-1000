@@ -36,8 +36,9 @@ int main( int argc, const char* argv[] )
 bool containsPerson( const Mat& src )
 {
     // create grid of HOG cells
+    const int numBins = 9;
     Size cellDims( 6, 6 );
-    Grid grid( src, cellDims );
+    Grid grid( src, cellDims, numBins );
 
     // Descriptor Blocks
 

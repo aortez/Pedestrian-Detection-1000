@@ -48,7 +48,6 @@ void Cell::addPixel( const double angle, const double weight )
 
 int Cell::angleToBinIndex( double angle, const int numBins, const bool shouldIgnoreSign )
 {
-    printf( "angle: %f\n", angle );
     assert( angle >= -CV_PI && angle <= CV_PI );
     // input angle is [-pi,+pi]
 
