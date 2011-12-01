@@ -47,13 +47,17 @@ Grid::Grid( Mat src, const Size cellDims, const int numBins ) :
     populateCells( mNumBins );
 
     // create hogImage
-    show( mSource, "source" );
     Mat hog = createHogImage( 5 );
-    show( hog, "hog" );
 
     // accumulate descriptor vectors
     const int blockWidth = 4;
     vector< Mat > descriptorVectors = createDescriptorVectors( blockWidth );
+
+    // normalize descriptorVectors
+    normalizeDescriptorVectors( descriptorVectors );
+
+    show( mSource, "source" );
+    show( hog, "hog" );
 
     waitKey();
 }
@@ -87,9 +91,10 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
     {
         for( int gridX = gridRangeX.start; gridX < gridRangeX.end; gridX++ )
         {
+            printf( "\nBlock starting @ x,y = (%d,%d)\n", gridX, gridY );
             const int descriptorVectorIndex = ( gridX - gridRangeX.start ) + ( gridY - gridRangeY.start ) * gridRangeX.size();
             Mat& descriptorVector = descriptorVectors[ descriptorVectorIndex ];
-            printf( "\nBlock starting @ x,y = (%d,%d)\n", gridX, gridY );
+
             // compute the range of cells in the block
             const Range cellRangeX( gridX - blockRadius, gridX - blockRadius + blockWidth );
             const Range cellRangeY( gridY - blockRadius, gridY - blockRadius + blockWidth );
@@ -104,7 +109,7 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
                     for( int i = 0; i < mNumBins; i++, descriptorIndex++ )
                     {
                         const double descriptorValue = cell( cellX, cellY ).bin( i );
-                        printf( "\t descriptorIndex: %d, value: %f\n", descriptorIndex, descriptorValue );
+                        printf( "%f, ", descriptorValue );
                         descriptorVector.at< double >( descriptorIndex, 1 ) = cell( cellX, cellY ).bin( i );
                     }
                 }
@@ -122,6 +127,38 @@ int Grid::dimX( void ) const
 int Grid::dimY( void ) const
 {
     return mGridDims.height;
+}
+
+void Grid::normalizeDescriptorVectors( std::vector< cv::Mat >& descriptorVectors )
+{
+    printf( "num descriptor vectors: %lu\n", descriptorVectors.size() );
+    // normalize locally to each descriptor vector
+    for ( size_t descriptorVectorIndex = 0; descriptorVectorIndex < descriptorVectors.size(); descriptorVectorIndex++ )
+    {
+        Mat& descriptors = descriptorVectors[ descriptorVectorIndex ];
+
+        // compute L2 norm for descriptor vector
+        const double epsilon = 0.0001;
+        double sumOfSquares = epsilon;
+        for ( int descriptorIndex = 0; descriptorIndex < descriptors.rows; descriptorIndex++ )
+        {
+            const double descriptorValue = descriptors.at< double >( descriptorIndex, 1 );
+            printf( "%f, ", descriptorValue );
+            sumOfSquares += descriptorValue * descriptorValue;
+//            printf( "descriptor[%d]: %f\n", descriptorIndex, descriptorValue );
+        }
+        const double l2Norm = std::sqrt( sumOfSquares );
+        printf( "\nL2Norm: %f\n", l2Norm );
+
+        // normalize
+        for ( int descriptorIndex = 0; descriptorIndex < descriptors.rows; descriptorIndex++ )
+        {
+            double& descriptorValue = descriptors.at< double >( descriptorIndex, 1 );
+//            printf( "descriptor[%d]: before: %f", descriptorIndex, descriptorValue );
+//            descriptorValue /= l2Norm;
+//            printf( "after: %f\n", descriptorValue );
+        }
+    }
 }
 
 void Grid::populateCells( int numBins )
