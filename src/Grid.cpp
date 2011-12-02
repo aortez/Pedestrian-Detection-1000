@@ -53,6 +53,13 @@ Grid::Grid( Mat src, const Size cellDims, const int numBins ) :
     const int blockWidth = 4;
     vector< Mat > descriptorVectors = createDescriptorVectors( blockWidth );
 
+    printf( "-------- printing values\n" );
+    for ( size_t i = 0; i < descriptorVectors.size(); i++ )
+    {
+        const double val = descriptorVectors[ i ].at< double >( 0 );
+        printf( "descriptorVectors[%lu].at(0) = %f\n", i, val );
+    }
+
     // normalize descriptorVectors
     normalizeDescriptorVectors( descriptorVectors );
 
@@ -84,16 +91,14 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
 
     // allocate memory for descriptor vectors
     const int numCellsPerBlock = blockWidth * blockWidth;
-    vector< Mat > descriptorVectors( gridRangeX.size() * gridRangeY.size(), Mat( numCellsPerBlock * mNumBins, 1, CV_64FC1 ) );
+    vector< Mat > descriptorVectors( gridRangeX.size() * gridRangeY.size() );
 
     // visit each block and populate its descriptor vector
     for( int gridY = gridRangeY.start; gridY < gridRangeY.end; gridY++ )
     {
         for( int gridX = gridRangeX.start; gridX < gridRangeX.end; gridX++ )
         {
-            printf( "\nBlock starting @ x,y = (%d,%d)\n", gridX, gridY );
-            const int descriptorVectorIndex = ( gridX - gridRangeX.start ) + ( gridY - gridRangeY.start ) * gridRangeX.size();
-            Mat& descriptorVector = descriptorVectors[ descriptorVectorIndex ];
+//            printf( "\nBlock starting @ x,y = (%d,%d), descriptorVectorIndex: %d\n", gridX, gridY, descriptorVectorIndex );
 
             // compute the range of cells in the block
             const Range cellRangeX( gridX - blockRadius, gridX - blockRadius + blockWidth );
@@ -102,6 +107,7 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
             // create the descriptor vector for this block
             // visit each cell in the block and copy the histogram values into
             // the descriptor vector
+            Mat descriptorVector( numCellsPerBlock * mNumBins, 1, CV_64FC1 );
             for( int descriptorIndex = 0, cellX = cellRangeX.start; cellX < cellRangeX.end; cellX++ )
             {
                 for ( int cellY = cellRangeY.start; cellY < cellRangeY.end; cellY++ )
@@ -109,13 +115,23 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
                     for( int i = 0; i < mNumBins; i++, descriptorIndex++ )
                     {
                         const double descriptorValue = cell( cellX, cellY ).bin( i );
-                        printf( "%f, ", descriptorValue );
-                        descriptorVector.at< double >( descriptorIndex, 1 ) = cell( cellX, cellY ).bin( i );
+//                        printf( "[%d]: %f, ", descriptorIndex, descriptorValue );
+                        descriptorVector.at< double >( descriptorIndex, 1 ) = descriptorValue;
                     }
                 }
             }
+            const int descriptorVectorIndex = ( gridX - gridRangeX.start ) + ( gridY - gridRangeY.start ) * gridRangeX.size();
+            descriptorVectors[ descriptorVectorIndex ] = descriptorVector;
         }
     }
+    printf( "aaaaaaaa printing values\n" );
+    for ( size_t i = 0; i < descriptorVectors.size(); i++ )
+    {
+        const double val = descriptorVectors[ i ].at< double >( 2 );
+        printf( "descriptorVectors[%lu].at(0) = %f\n", i, val );
+    }
+
+
     return descriptorVectors;
 }
 
