@@ -43,6 +43,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1029233748" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
 								<option id="gnu.cpp.link.option.libs.944261294" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="UnitTest++"/>
+									<listOptionValue builtIn="false" value="opencv_ml"/>
 									<listOptionValue builtIn="false" value="opencv_imgproc"/>
 									<listOptionValue builtIn="false" value="X11"/>
 									<listOptionValue builtIn="false" value="opencv_core"/>
@@ -110,6 +111,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.244473359" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
 								<option id="gnu.cpp.link.option.libs.377613679" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="UnitTest++"/>
+									<listOptionValue builtIn="false" value="opencv_ml"/>
 									<listOptionValue builtIn="false" value="opencv_imgproc"/>
 									<listOptionValue builtIn="false" value="X11"/>
 									<listOptionValue builtIn="false" value="opencv_core"/>

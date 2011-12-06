@@ -83,7 +83,7 @@ Cell& Grid::cell( int x, int y )
 
 vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
 {
-    // compute range of blocks (by top-left corner)
+    // compute range of blocks (from top-left corner)
     const int blockRadius = blockWidth / 2;
     const Range gridRangeX( blockRadius, dimX() - blockRadius );
     const Range gridRangeY( blockRadius, dimY() - blockRadius );
