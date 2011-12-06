@@ -40,11 +40,21 @@ bool containsPerson( const Mat& src )
     Size cellDims( 6, 6 );
     Grid grid( src, cellDims, numBins );
 
-    // Descriptor Blocks
+    // get descriptors
+    const vector< Mat > descriptorVectors = grid.getDescriptorVectors();
 
-    // Block Normalization
+    // create SVM
+    CvSVMParams params;
+    params.svm_type = CvSVM::C_SVC;
+    params.kernel_type = CvSVM::LINEAR;
+    params.term_crit = cvTermCriteria( CV_TERMCRIT_ITER, 100, 1e-6 );
+    CvSVM svm;
 
-    // SVM classification
+    // train SVM
+    for ( size_t i = 0; i < descriptorVectors.size(); i++ )
+    {
+        svm.train( trainingData, labels, Mat(), Mat(), params );
+    }
 
     return false;
 }

@@ -53,15 +53,11 @@ Grid::Grid( Mat src, const Size cellDims, const int numBins ) :
     const int blockWidth = 4;
     vector< Mat > descriptorVectors = createDescriptorVectors( blockWidth );
 
-    printf( "-------- printing values\n" );
-    for ( size_t i = 0; i < descriptorVectors.size(); i++ )
-    {
-        const double val = descriptorVectors[ i ].at< double >( 0 );
-        printf( "descriptorVectors[%lu].at(0) = %f\n", i, val );
-    }
-
     // normalize descriptorVectors
     normalizeDescriptorVectors( descriptorVectors );
+
+    // save descriptor vectors
+    mDescriptorVector = descriptorVectors;
 
     show( mSource, "source" );
     show( hog, "hog" );
@@ -87,7 +83,7 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
     const int blockRadius = blockWidth / 2;
     const Range gridRangeX( blockRadius, dimX() - blockRadius );
     const Range gridRangeY( blockRadius, dimY() - blockRadius );
-    printf( "blockWidth: %d, blockRadius: %d\n", blockWidth, blockRadius );
+//    printf( "blockWidth: %d, blockRadius: %d\n", blockWidth, blockRadius );
 
     // allocate memory for descriptor vectors
     const int numCellsPerBlock = blockWidth * blockWidth;
@@ -110,7 +106,7 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
             Mat descriptorVector( numCellsPerBlock * mNumBins, 1, CV_64FC1 );
             for( int descriptorIndex = 0, cellX = cellRangeX.start; cellX < cellRangeX.end; cellX++ )
             {
-                for ( int cellY = cellRangeY.start; cellY < cellRangeY.end; cellY++ )
+                for( int cellY = cellRangeY.start; cellY < cellRangeY.end; cellY++ )
                 {
                     for( int i = 0; i < mNumBins; i++, descriptorIndex++ )
                     {
@@ -124,13 +120,12 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
             descriptorVectors[ descriptorVectorIndex ] = descriptorVector;
         }
     }
-    printf( "aaaaaaaa printing values\n" );
-    for ( size_t i = 0; i < descriptorVectors.size(); i++ )
-    {
-        const double val = descriptorVectors[ i ].at< double >( 2 );
-        printf( "descriptorVectors[%lu].at(0) = %f\n", i, val );
-    }
-
+//    printf( "aaaaaaaa printing values\n" );
+//    for ( size_t i = 0; i < descriptorVectors.size(); i++ )
+//    {
+//        const double val = descriptorVectors[ i ].at< double >( 2 );
+//        printf( "descriptorVectors[%lu].at(0) = %f\n", i, val );
+//    }
 
     return descriptorVectors;
 }
@@ -145,18 +140,24 @@ int Grid::dimY( void ) const
     return mGridDims.height;
 }
 
+const std::vector< cv::Mat >& Grid::getDescriptorVectors( void ) const
+{
+    return mDescriptorVector;
+
+}
+
 void Grid::normalizeDescriptorVectors( std::vector< cv::Mat >& descriptorVectors )
 {
     printf( "num descriptor vectors: %lu\n", descriptorVectors.size() );
     // normalize locally to each descriptor vector
-    for ( size_t descriptorVectorIndex = 0; descriptorVectorIndex < descriptorVectors.size(); descriptorVectorIndex++ )
+    for( size_t descriptorVectorIndex = 0; descriptorVectorIndex < descriptorVectors.size(); descriptorVectorIndex++ )
     {
         Mat& descriptors = descriptorVectors[ descriptorVectorIndex ];
 
         // compute L2 norm for descriptor vector
         const double epsilon = 0.0001;
         double sumOfSquares = epsilon;
-        for ( int descriptorIndex = 0; descriptorIndex < descriptors.rows; descriptorIndex++ )
+        for( int descriptorIndex = 0; descriptorIndex < descriptors.rows; descriptorIndex++ )
         {
             const double descriptorValue = descriptors.at< double >( descriptorIndex, 1 );
             printf( "%f, ", descriptorValue );
@@ -167,7 +168,7 @@ void Grid::normalizeDescriptorVectors( std::vector< cv::Mat >& descriptorVectors
         printf( "\nL2Norm: %f\n", l2Norm );
 
         // normalize
-        for ( int descriptorIndex = 0; descriptorIndex < descriptors.rows; descriptorIndex++ )
+        for( int descriptorIndex = 0; descriptorIndex < descriptors.rows; descriptorIndex++ )
         {
             double& descriptorValue = descriptors.at< double >( descriptorIndex, 1 );
 //            printf( "descriptor[%d]: before: %f", descriptorIndex, descriptorValue );

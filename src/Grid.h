@@ -19,6 +19,8 @@ public:
 
     int dimY(void) const;
 
+    const std::vector< cv::Mat >& getDescriptorVectors( void ) const;
+
     void normalizeDescriptorVectors( std::vector< cv::Mat >& descriptorVectors );
 
 private:
@@ -26,6 +28,7 @@ private:
 
     std::vector< Cell > mCell;
     cv::Size mCellDims;
+    std::vector< cv::Mat > mDescriptorVector;
     cv::Size mGridDims;
     int mNumBins;
     cv::Mat mSource;

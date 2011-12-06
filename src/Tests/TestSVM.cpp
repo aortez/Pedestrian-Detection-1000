@@ -30,8 +30,8 @@ TEST( SimpleTest )
     SVM.train( trainingData, labels, Mat(), Mat(), params );
     SVM.train( trainingData2, labels, Mat(), Mat(), params );
 
-    Vec3b green( 0, 255, 0 ), blue( 255, 0, 0 );
     // Show the decision regions given by the SVM
+    Vec3b green( 0, 255, 0 ), blue( 255, 0, 0 );
     for( int i = 0; i < image.rows; ++i )
         for( int j = 0; j < image.cols; ++j )
         {
