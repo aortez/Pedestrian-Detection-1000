@@ -19,8 +19,8 @@ void Cell::addImage( const cv::Mat& src )
     Mat gradient_horz( mSource.size(), CV_64F );
     Mat gradient_vert( mSource.size(), CV_64F );
     {
-        Mat kernel_horz = ( Mat_< double >( 1, 3 ) << -1, 0, 1 );
-        Mat kernel_vert = ( Mat_< double >( 3, 1 ) << -1, 0, 1 );
+        Mat kernel_horz = ( Mat_< float >( 1, 3 ) << -1, 0, 1 );
+        Mat kernel_vert = ( Mat_< float >( 3, 1 ) << -1, 0, 1 );
         filter2D( mSource, gradient_horz, -1, kernel_horz );
         filter2D( mSource, gradient_vert, -1, kernel_vert );
     }
@@ -29,9 +29,9 @@ void Cell::addImage( const cv::Mat& src )
     {
         for( int x = 0; x < src.cols; x++ )
         {
-            const Vec2d vec( gradient_horz.at< double >( y, x ), gradient_vert.at< double >( y, x ) );
-            const double mag = norm( vec );
-            const double angle = atan2( vec[ 1 ], vec[ 0 ] );
+            const Vec2d vec( gradient_horz.at< float >( y, x ), gradient_vert.at< float >( y, x ) );
+            const float mag = norm( vec );
+            const double angle = atan2( static_cast<double>( vec[ 1 ] ), static_cast<double>( vec[ 0 ] ) );
 //            printf( "@(%d,%d): (h,v) = (%f, %f), angle = %f, magnitude = %f\n", x, y, vec[ 0 ], vec[ 1 ], angle, mag );
 
             addPixel( angle, mag );
@@ -39,7 +39,7 @@ void Cell::addImage( const cv::Mat& src )
     }
 }
 
-void Cell::addPixel( const double angle, const double weight )
+void Cell::addPixel( const double angle, const float weight )
 {
     const int binIndex = angleToBinIndex( angle, mBins.size(), mShouldIgnoreSign );
     mBins[ binIndex ] += weight;
@@ -108,16 +108,16 @@ double Cell::binIndexToAngle( const int binIndex, const int numBins, const bool 
     return angle;
 }
 
-double Cell::binNormalized( const int binIndex ) const
+float Cell::binNormalized( const int binIndex ) const
 {
-    const double votes = bin( binIndex );
+    const float votes = bin( binIndex );
     return votes / mSampleSum;
 }
 
 Mat Cell::drawHOG( int cellScale ) const
 {
     const int scale = cellScale;
-    const double magnitudeScalar = scale * 5.0;
+    const float magnitudeScalar = scale * 5.0;
     Mat out;
     resize( mSource, out, mSource.size() * scale );
     Point center( mSource.cols / 2 * scale, mSource.rows / 2 * scale );
@@ -125,7 +125,7 @@ Mat Cell::drawHOG( int cellScale ) const
 
     for( int binIndex = 0; binIndex < numBins(); binIndex++ )
     {
-        const double magnitude = binNormalized( binIndex ) * magnitudeScalar;
+        const float magnitude = binNormalized( binIndex ) * magnitudeScalar;
         const double angle = binAngle( binIndex );
         Point end( center.x + cos( angle ) * magnitude, center.y + sin( angle ) * magnitude );
         line( out, center, end, color );
@@ -134,12 +134,12 @@ Mat Cell::drawHOG( int cellScale ) const
     return out;
 }
 
-const vector< double >& Cell::getHog( void ) const
+const vector< float >& Cell::getHog( void ) const
 {
     return mBins;
 }
 
-double Cell::getSum( void ) const
+float Cell::getSum( void ) const
 {
     return mSampleSum;
 }
