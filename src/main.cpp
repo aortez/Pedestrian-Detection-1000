@@ -1,60 +1,52 @@
 #include <UnitTest++.h>
 #include <cstdio>
 #include <cv.h>
+#include <opencv2/ml/ml.hpp>
 #include <highgui.h>
 #include <iostream>
-#include "Cell.h"
-#include "Grid.h"
+#include "Detector.h"
 using namespace cv;
 using namespace std;
 
-bool containsPerson( const Mat& img );
 
 int main( int argc, const char* argv[] )
 {
-    Mat src;
+//    Mat src;
     if( argc > 1 )
     {
         if ( argv[ 1 ] == string( "-test" ) )
         {
             return UnitTest::RunAllTests();
         }
-        else
-        {
-            src = imread( argv[ 1 ] );
-        }
     }
-    else
-    {
-        src = imread( "test.png" );
-    }
+//        else
+//        {
+//            src = imread( argv[ 1 ] );
+//        }
+//    }
+//    else
+//    {
+//        src = imread( "test.png" );
+//    }
 
-    cout << "Is a person: " << boolalpha << containsPerson( src ) << endl;
+    Detector detector;
+
+    Mat src1 = imread( "test.png" );
+    Mat src2 = imread( "test2.png" );
+    Mat src3 = imread( "test3.png" );
+    Mat src4 = imread( "test4.png" );
+
+    detector.train( src1, true );
+    detector.train( src2, true );
+    detector.train( src3, true );
+    detector.train( src4, true );
+
+    Mat neg1 = imread( "neg1.png" );
+    Mat neg2 = imread( "neg2.png" );
+    Mat neg3 = imread( "neg3.png" );
+    Mat neg4 = imread( "neg4.png" );
+
+
     return 0;
 }
 
-bool containsPerson( const Mat& src )
-{
-    // create grid of HOG cells
-    const int numBins = 9;
-    Size cellDims( 6, 6 );
-    Grid grid( src, cellDims, numBins );
-
-    // get descriptors
-    const vector< Mat > descriptorVectors = grid.getDescriptorVectors();
-
-    // create SVM
-    CvSVMParams params;
-    params.svm_type = CvSVM::C_SVC;
-    params.kernel_type = CvSVM::LINEAR;
-    params.term_crit = cvTermCriteria( CV_TERMCRIT_ITER, 100, 1e-6 );
-    CvSVM svm;
-
-    // train SVM
-    for ( size_t i = 0; i < descriptorVectors.size(); i++ )
-    {
-        svm.train( trainingData, labels, Mat(), Mat(), params );
-    }
-
-    return false;
-}

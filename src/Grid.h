@@ -15,9 +15,9 @@ public:
 
     cv::Mat createHogImage( int scale );
 
-    int dimX(void) const;
+    int dimX( void ) const;
 
-    int dimY(void) const;
+    int dimY( void ) const;
 
     const std::vector< cv::Mat >& getDescriptorVectors( void ) const;
 
