@@ -10,8 +10,9 @@ public:
     ~Grid( void );
 
     Cell& cell( int x, int y );
+    const Cell& cell( int x, int y ) const;
 
-    std::vector< cv::Mat > createDescriptorVectors( int blockWidth );
+    std::vector< cv::Mat > createDescriptorVectors( int blockWidth ) const;
 
     cv::Mat createHogImage( int scale );
 

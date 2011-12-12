@@ -16,8 +16,8 @@ void Cell::addImage( const cv::Mat& src )
 {
     mSource = src.clone();
 
-    Mat gradient_horz( mSource.size(), CV_64F );
-    Mat gradient_vert( mSource.size(), CV_64F );
+    Mat gradient_horz( mSource.size(), CV_32F );
+    Mat gradient_vert( mSource.size(), CV_32F );
     {
         Mat kernel_horz = ( Mat_< float >( 1, 3 ) << -1, 0, 1 );
         Mat kernel_vert = ( Mat_< float >( 3, 1 ) << -1, 0, 1 );

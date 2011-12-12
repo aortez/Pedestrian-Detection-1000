@@ -18,6 +18,23 @@ TEST( SimpleTest )
     Mat labels = ( Mat_< float >( 3, 1 ) << 1, 1, -1, -1 );
     Mat trainingData = ( Mat_< float >( 3, 2 ) << 501, 10, 255, 10, 501, 255, 10, 501 );
     Mat trainingData2 = ( Mat_< float >( 3, 2 ) << 401, 110, 255, 110, 401, 255, 110, 401 );
+//    vector< Mat > labels( 4 );
+//    labels[ 0 ] = ( Mat_< float >( 1, 1 ) << 1 );
+//    labels[ 1 ] = ( Mat_< float >( 1, 1 ) << 1 );
+//    labels[ 2 ] = ( Mat_< float >( 1, 1 ) << -1 );
+//    labels[ 3 ] = ( Mat_< float >( 1, 1 ) << -1 );
+//
+//    vector< Mat > trainingData1( 4 );
+//    trainingData1[ 0 ] = ( Mat_< float >( 1, 2 ) << 501, 10 );
+//    trainingData1[ 1 ] = ( Mat_< float >( 1, 2 ) << 255, 10 );
+//    trainingData1[ 2 ] = ( Mat_< float >( 1, 2 ) << 501, 255 );
+//    trainingData1[ 3 ] = ( Mat_< float >( 1, 2 ) << 10, 501 );
+//
+//    vector< Mat > trainingData2( 4 );
+//    trainingData2[ 0 ] = ( Mat_< float >( 1, 2 ) << 401, 110 );
+//    trainingData2[ 1 ] = ( Mat_< float >( 1, 2 ) << 255, 110 );
+//    trainingData2[ 2 ] = ( Mat_< float >( 1, 2 ) << 401, 255 );
+//    trainingData2[ 3 ] = ( Mat_< float >( 1, 2 ) << 110, 401 );
 
     // Set up SVM's parameters
     CvSVMParams params;
@@ -27,8 +44,15 @@ TEST( SimpleTest )
 
     // Train the SVM
     CvSVM SVM;
-    SVM.train( trainingData, labels, Mat(), Mat(), params );
-    SVM.train( trainingData2, labels, Mat(), Mat(), params );
+//    for ( size_t i = 0; i < labels.size(); i++ )
+//    {
+//        const Mat& training1 = trainingData1[ i ];
+//        const Mat& training2 = trainingData2[ i ];
+//        const Mat& label = labels[ i ];
+
+        SVM.train( trainingData, labels, Mat(), Mat(), params );
+        SVM.train( trainingData2, labels, Mat(), Mat(), params );
+//    }
 
     // Show the decision regions given by the SVM
     Vec3b green( 0, 255, 0 ), blue( 255, 0, 0 );
@@ -38,9 +62,9 @@ TEST( SimpleTest )
             Mat sampleMat = ( Mat_< float >( 1, 2 ) << i, j );
             float response = SVM.predict( sampleMat );
 
-            if( response == 1 )
+            if( response > 0 )
                 image.at< Vec3b >( j, i ) = green;
-            else if( response == -1 ) image.at< Vec3b >( j, i ) = blue;
+            else if( response < 0 ) image.at< Vec3b >( j, i ) = blue;
         }
 
     // Show the training data

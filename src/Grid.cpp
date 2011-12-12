@@ -46,9 +46,6 @@ Grid::Grid( Mat src, const Size cellDims, const int numBins ) :
     // populate cells
     populateCells( mNumBins );
 
-    // create hogImage
-    Mat hog = createHogImage( 5 );
-
     // accumulate descriptor vectors
     const int blockWidth = 4;
     vector< Mat > descriptorVectors = createDescriptorVectors( blockWidth );
@@ -58,11 +55,6 @@ Grid::Grid( Mat src, const Size cellDims, const int numBins ) :
 
     // save descriptor vectors
     mDescriptorVector = descriptorVectors;
-
-    show( mSource, "source" );
-    show( hog, "hog" );
-
-    waitKey();
 }
 
 Grid::~Grid( void )
@@ -71,13 +63,18 @@ Grid::~Grid( void )
 
 Cell& Grid::cell( int x, int y )
 {
+    return const_cast< Cell& >( static_cast< const Grid* >( this )->cell( x, y ) );
+}
+
+const Cell& Grid::cell( int x, int y ) const
+{
     assert( x >= 0 && x < dimX() );
     assert( y >= 0 && y < dimY() );
 
     return mCell[ x + y * dimX() ];
 }
 
-vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
+vector< Mat > Grid::createDescriptorVectors( const int blockWidth ) const
 {
     // compute range of blocks (from top-left corner)
     const int blockRadius = blockWidth / 2;
@@ -88,6 +85,9 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
     // allocate memory for descriptor vectors
     const int numCellsPerBlock = blockWidth * blockWidth;
     vector< Mat > descriptorVectors( gridRangeX.size() * gridRangeY.size() );
+
+    Mat descriptorVector( 1, numCellsPerBlock * mNumBins, CV_32FC1 );
+    printf( "\nDescriptor size:%s\n", toString( descriptorVector ).c_str() );
 
     // visit each block and populate its descriptor vector
     for( int gridY = gridRangeY.start; gridY < gridRangeY.end; gridY++ )
@@ -103,7 +103,6 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
             // create the descriptor vector for this block
             // visit each cell in the block and copy the histogram values into
             // the descriptor vector
-            Mat descriptorVector( numCellsPerBlock * mNumBins, 1, CV_32FC1 );
             for( int descriptorIndex = 0, cellX = cellRangeX.start; cellX < cellRangeX.end; cellX++ )
             {
                 for( int cellY = cellRangeY.start; cellY < cellRangeY.end; cellY++ )
@@ -111,13 +110,13 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth )
                     for( int i = 0; i < mNumBins; i++, descriptorIndex++ )
                     {
                         const float descriptorValue = cell( cellX, cellY ).bin( i );
-//                        printf( "[%d]: %f, ", descriptorIndex, descriptorValue );
-                        descriptorVector.at< float >( descriptorIndex, 1 ) = descriptorValue;
+//                        printf( "[%d]: %f,\n ", descriptorIndex, descriptorValue );
+                        descriptorVector.at< float >( 0, descriptorIndex ) = descriptorValue;
                     }
                 }
             }
-            const int descriptorVectorIndex = ( gridX - gridRangeX.start ) + ( gridY - gridRangeY.start ) * gridRangeX.size();
-            descriptorVectors[ descriptorVectorIndex ] = descriptorVector;
+           const int descriptorVectorIndex = ( gridX - gridRangeX.start ) + ( gridY - gridRangeY.start ) * gridRangeX.size();
+           descriptorVectors[ descriptorVectorIndex ] = descriptorVector.clone();
         }
     }
 
@@ -144,7 +143,7 @@ void Grid::normalizeDescriptorVectors( std::vector< cv::Mat >& descriptorVectors
 {
     // TODO: assert descriptor of correct datatype
 
-    printf( "num descriptor vectors: %lu\n", descriptorVectors.size() );
+    printf( "\nnum descriptor vectors: %lu\n", descriptorVectors.size() );
     // normalize locally to each descriptor vector
     for( size_t descriptorVectorIndex = 0; descriptorVectorIndex < descriptorVectors.size(); descriptorVectorIndex++ )
     {
@@ -155,20 +154,19 @@ void Grid::normalizeDescriptorVectors( std::vector< cv::Mat >& descriptorVectors
         double sumOfSquares = epsilon;
         for( int descriptorIndex = 0; descriptorIndex < descriptors.rows; descriptorIndex++ )
         {
-            const float descriptorValue = descriptors.at< float >( descriptorIndex, 1 );
-            printf( "%f, ", descriptorValue );
+            const float descriptorValue = descriptors.at< float >( 0, descriptorIndex );
             sumOfSquares += descriptorValue * descriptorValue;
-//            printf( "descriptor[%d]: %f\n", descriptorIndex, descriptorValue );
+            printf( "descriptor[%d]: %f\n", descriptorIndex, descriptorValue );
         }
         const float l2Norm = std::sqrt( sumOfSquares );
-        printf( "\nL2Norm: %f\n", l2Norm );
+        printf( "L2Norm: %f\n", l2Norm );
 
         // normalize
         for( int descriptorIndex = 0; descriptorIndex < descriptors.rows; descriptorIndex++ )
         {
-            float& descriptorValue = descriptors.at< float >( descriptorIndex, 1 );
+            float& descriptorValue = descriptors.at< float >( 0, descriptorIndex );
 //            printf( "descriptor[%d]: before: %f", descriptorIndex, descriptorValue );
-//            descriptorValue /= l2Norm;
+            descriptorValue /= l2Norm;
 //            printf( "after: %f\n", descriptorValue );
         }
     }

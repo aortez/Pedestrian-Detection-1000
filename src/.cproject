@@ -119,7 +119,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.paths.833085569" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/usr/lib"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}&quot;/UnitTest++&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}&quot;/UnitTest++"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.460542598" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
