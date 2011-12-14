@@ -37,11 +37,11 @@ TEST_FIXTURE( CellFixture, angleToBinIndex_ignoreSignFalse )
 
 TEST_FIXTURE( CellFixture, angleToBinIndex_ignoreSignTrue )
 {
-    const double angle[ 3 ] =
-    { 0, -CV_PI * .75, CV_PI * 0.25 };
+    const double angle[ 4 ] =
+    { 0, -CV_PI * .75, CV_PI * 0.25, CV_PI };
 
-    const int expectedBin[ 3 ] =
-    { 0, 1, 1 };
+    const int expectedBin[ 4 ] =
+    { 0, 1, 1, 4 };
 
     const int numBins = 5;
 
@@ -49,10 +49,12 @@ TEST_FIXTURE( CellFixture, angleToBinIndex_ignoreSignTrue )
     computedBin[ 0 ] = CellFixture::angleToBinIndex( angle[ 0 ], numBins, true );
     computedBin[ 1 ] = CellFixture::angleToBinIndex( angle[ 1 ], numBins, true );
     computedBin[ 2 ] = CellFixture::angleToBinIndex( angle[ 2 ], numBins, true );
+    computedBin[ 3 ] = CellFixture::angleToBinIndex( angle[ 3 ], numBins, true );
 
     CHECK_EQUAL( expectedBin[ 0 ], computedBin[ 0 ] );
     CHECK_EQUAL( expectedBin[ 1 ], computedBin[ 1 ] );
     CHECK_EQUAL( expectedBin[ 2 ], computedBin[ 2 ] );
+    CHECK_EQUAL( expectedBin[ 3 ], computedBin[ 3 ] );
 }
 
 TEST_FIXTURE( CellFixture, vecToAngle )

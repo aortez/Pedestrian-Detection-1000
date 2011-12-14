@@ -6,7 +6,7 @@
 class Grid
 {
 public:
-    Grid( cv::Mat src, cv::Size cellDims, int numBins );
+    Grid( cv::Mat src, cv::Size cellDims, int numBins, bool shouldIgnoreSign );
     ~Grid( void );
 
     Cell& cell( int x, int y );
@@ -25,12 +25,13 @@ public:
     void normalizeDescriptorVectors( std::vector< cv::Mat >& descriptorVectors );
 
 private:
-    void populateCells( int numBins );
+    void populateCells( void );
 
     std::vector< Cell > mCell;
     cv::Size mCellDims;
     std::vector< cv::Mat > mDescriptorVector;
     cv::Size mGridDims;
     int mNumBins;
+    const bool mShouldIgnoreSign;
     cv::Mat mSource;
 };

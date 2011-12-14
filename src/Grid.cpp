@@ -6,8 +6,6 @@
 using namespace cv;
 using namespace std;
 
-const bool shouldIgnoreSign = false;
-
 Mat Grid::createHogImage( const int scale )
 {
     // create HOG
@@ -30,21 +28,19 @@ Mat Grid::createHogImage( const int scale )
     return hog;
 }
 
-Grid::Grid( Mat src, const Size cellDims, const int numBins ) :
-        mCellDims( cellDims ), mNumBins( numBins )
+Grid::Grid( Mat src, const Size cellDims, const int numBins, const bool shouldIgnoreSign )
+        : mCellDims( cellDims ), mNumBins( numBins ), mShouldIgnoreSign( shouldIgnoreSign )
 {
-    // TODO: only perform these conversions if the image is not of the correct type(grayscale 32bit float)
     // convert to greyscale
     Mat bwSrc;
     cvtColor( src, bwSrc, CV_RGB2GRAY );
 
     // convert to floating point
     bwSrc.convertTo( bwSrc, CV_32F, 1.0 / 255 );
-
     mSource = bwSrc;
 
     // populate cells
-    populateCells( mNumBins );
+    populateCells();
 
     // accumulate descriptor vectors
     const int blockWidth = 4;
@@ -87,7 +83,7 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth ) const
     vector< Mat > descriptorVectors( gridRangeX.size() * gridRangeY.size() );
 
     Mat descriptorVector( 1, numCellsPerBlock * mNumBins, CV_32FC1 );
-    printf( "\nDescriptor size:%s\n", toString( descriptorVector ).c_str() );
+//    printf( "\nDescriptor size:%s\n", toString( descriptorVector ).c_str() );
 
     // visit each block and populate its descriptor vector
     for( int gridY = gridRangeY.start; gridY < gridRangeY.end; gridY++ )
@@ -115,8 +111,8 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth ) const
                     }
                 }
             }
-           const int descriptorVectorIndex = ( gridX - gridRangeX.start ) + ( gridY - gridRangeY.start ) * gridRangeX.size();
-           descriptorVectors[ descriptorVectorIndex ] = descriptorVector.clone();
+            const int descriptorVectorIndex = ( gridX - gridRangeX.start ) + ( gridY - gridRangeY.start ) * gridRangeX.size();
+            descriptorVectors[ descriptorVectorIndex ] = descriptorVector.clone();
         }
     }
 
@@ -143,7 +139,7 @@ void Grid::normalizeDescriptorVectors( std::vector< cv::Mat >& descriptorVectors
 {
     // TODO: assert descriptor of correct datatype
 
-    printf( "\nnum descriptor vectors: %lu\n", descriptorVectors.size() );
+//    printf( "\nnum descriptor vectors: %lu\n", descriptorVectors.size() );
     // normalize locally to each descriptor vector
     for( size_t descriptorVectorIndex = 0; descriptorVectorIndex < descriptorVectors.size(); descriptorVectorIndex++ )
     {
@@ -156,10 +152,10 @@ void Grid::normalizeDescriptorVectors( std::vector< cv::Mat >& descriptorVectors
         {
             const float descriptorValue = descriptors.at< float >( 0, descriptorIndex );
             sumOfSquares += descriptorValue * descriptorValue;
-            printf( "descriptor[%d]: %f\n", descriptorIndex, descriptorValue );
+//            printf( "descriptor[%d]: %f\n", descriptorIndex, descriptorValue );
         }
         const float l2Norm = std::sqrt( sumOfSquares );
-        printf( "L2Norm: %f\n", l2Norm );
+//        printf( "L2Norm: %f\n", l2Norm );
 
         // normalize
         for( int descriptorIndex = 0; descriptorIndex < descriptors.rows; descriptorIndex++ )
@@ -172,15 +168,15 @@ void Grid::normalizeDescriptorVectors( std::vector< cv::Mat >& descriptorVectors
     }
 }
 
-void Grid::populateCells( int numBins )
+void Grid::populateCells( void )
 {
     // allocate cells
     mGridDims.width = mSource.cols / mCellDims.width;
     mGridDims.height = mSource.rows / mCellDims.height;
-    mCell.resize( mGridDims.width * mGridDims.height, Cell( 9, shouldIgnoreSign ) );
+    mCell.resize( mGridDims.width * mGridDims.height, Cell( mNumBins, mShouldIgnoreSign ) );
 
     // populate cells
-    printf( "(gridWidth, gridHeight) = (%d,%d)\n", dimX(), dimY() );
+//    printf( "(gridWidth, gridHeight) = (%d,%d)\n", dimX(), dimY() );
     for( int gridY = 0; gridY < dimY(); gridY++ )
     {
         for( int gridX = 0; gridX < dimX(); gridX++ )

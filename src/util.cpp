@@ -3,6 +3,15 @@
 using namespace std;
 using namespace cv;
 
+void assertTrue( const bool truthVal, const std::string& errMsg )
+{
+    if ( !truthVal )
+    {
+        printf( "%s\n", errMsg.c_str() );
+        exit( -1 );
+    }
+}
+
 void show(
         const Mat& img,
         const string& windowName,

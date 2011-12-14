@@ -32,8 +32,6 @@ void Cell::addImage( const cv::Mat& src )
             const Vec2d vec( gradient_horz.at< float >( y, x ), gradient_vert.at< float >( y, x ) );
             const float mag = norm( vec );
             const double angle = atan2( static_cast<double>( vec[ 1 ] ), static_cast<double>( vec[ 0 ] ) );
-//            printf( "@(%d,%d): (h,v) = (%f, %f), angle = %f, magnitude = %f\n", x, y, vec[ 0 ], vec[ 1 ], angle, mag );
-
             addPixel( angle, mag );
         }
     }
@@ -58,6 +56,7 @@ int Cell::angleToBinIndex( double angle, const int numBins, const bool shouldIgn
         // if negative, then map into positive range [0,pi]
         if( angle < 0 ) angle += CV_PI;
         // scale from [0,pi] -> [0,1]
+        normalizedAngle = angle / CV_PI;
     }
     else
     {
@@ -65,12 +64,10 @@ int Cell::angleToBinIndex( double angle, const int numBins, const bool shouldIgn
         normalizedAngle = angle / CV_PI;
         normalizedAngle = angle / ( 2 * CV_PI ) + 0.5;
     }
-//    printf( "normlized angle: %f\n", normalizedAngle );
     assert( normalizedAngle >= 0 && normalizedAngle <= 1 );
 
     // compute bin index
     const int binIndex = static_cast< int >( round( normalizedAngle * ( numBins - 1 ) ) );
-//    printf( "angle: %f, binIndex: %d\n", angle, binIndex );
     assert( binIndex < numBins && binIndex >= 0 );
 
     return binIndex;

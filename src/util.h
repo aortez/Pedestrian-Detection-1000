@@ -3,6 +3,8 @@
 #include <string>
 namespace cv { struct Mat; }
 
+void assertTrue( bool truthVal, const std::string& errMsg );
+
 void show(
         const cv::Mat& img,
         const std::string& windowName,
