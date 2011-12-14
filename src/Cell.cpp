@@ -69,7 +69,7 @@ int Cell::angleToBinIndex( double angle, const int numBins, const bool shouldIgn
     assert( normalizedAngle >= 0 && normalizedAngle <= 1 );
 
     // compute bin index
-    const int binIndex = static_cast< int >( round( normalizedAngle * ( numBins - 1 ) ) );
+    const int binIndex = static_cast< int >( floor( normalizedAngle * ( numBins - 1 ) + 0.5 ) );
 //    printf( "angle: %f, binIndex: %d\n", angle, binIndex );
     assert( binIndex < numBins && binIndex >= 0 );
 
