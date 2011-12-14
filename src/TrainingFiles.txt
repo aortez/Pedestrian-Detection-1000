@@ -1,5 +1,4 @@
 #####################  negative training images ###############################
-- Images/neg/00001147.png
 - Images/neg/00001148.png
 - Images/neg/00001149.png
 - Images/neg/00001150.png
@@ -11,15 +10,6 @@
 - Images/neg/00001158.png
 - Images/neg/00001159.png
 - Images/neg/00001160.png
-- Images/neg/00001161.png
-- Images/neg/00001162.png
-- Images/neg/00001163.png
-- Images/neg/00001165.png
-- Images/neg/00001166.png
-- Images/neg/00001167.png
-- Images/neg/00001168.png
-- Images/neg/00001169.png
-- Images/neg/00001170.png
 - Images/neg/00001171.png
 - Images/neg/00001172.png
 - Images/neg/00001173.png
@@ -1317,8 +1307,6 @@
 + Images/pos/person_325b.png
 + Images/pos/person_325c.png
 + Images/pos/person_325d.png
-+ Images/pos/person_335a.png
-+ Images/pos/person_335b.png
 + Images/pos/person_335c.png
 + Images/pos/person_335d.png
 + Images/pos/person_335e.png
@@ -1343,14 +1331,6 @@
 + Images/pos/person_347b.png
 + Images/pos/person_347c.png
 + Images/pos/person_347d.png
-+ Images/pos/person_350a.png
-+ Images/pos/person_350b.png
-+ Images/pos/person_350c.png
-+ Images/pos/person_350d.png
-+ Images/pos/person_350e.png
-+ Images/pos/person_350f.png
-+ Images/pos/person_350g.png
-+ Images/pos/person_350h.png
 + Images/pos/person_and_bike_004a.png
 + Images/pos/person_and_bike_004b.png
 + Images/pos/person_and_bike_006a.png
@@ -1565,8 +1545,6 @@
 + Images/pos/person_and_bike_161b.png
 + Images/pos/person_and_bike_162a.png
 + Images/pos/person_and_bike_162b.png
-+ Images/pos/person_and_bike_163a.png
-+ Images/pos/person_and_bike_163b.png
 + Images/pos/person_and_bike_164a.png
 + Images/pos/person_and_bike_164b.png
 + Images/pos/person_and_bike_165a.png

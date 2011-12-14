@@ -17,7 +17,7 @@ public:
             bool isPositive,
             bool shouldShowHogImage = false );
 
-    float classify(
+    double classify(
             const cv::Mat& image,
             bool shouldShowHogImage = false );
 

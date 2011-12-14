@@ -55,6 +55,7 @@ int main( int argc, const char* argv[] )
     switch( operatingMode )
     {
     case OperatingMode::classify:
+    	printf( "Classifying: %s\n", fileName.c_str() );
         detector.classify( imread( fileName ), true );
         break;
     case OperatingMode::train:
@@ -74,83 +75,6 @@ int main( int argc, const char* argv[] )
         return 0;
         break;
     }
-
-    return 0;
-
-    vector< string > posFiles;
-    posFiles.push_back( "test.png" );
-    posFiles.push_back( "test2.png" );
-    posFiles.push_back( "test3.png" );
-    posFiles.push_back( "test4.png" );
-//        posFiles.push_back( "Test/pos/crop001501a.png" );
-//        posFiles.push_back( "Test/pos/crop001501b.png" );
-//        posFiles.push_back( "Test/pos/crop001501c.png" );
-//        posFiles.push_back( "Test/pos/crop001501d.png" );
-//        posFiles.push_back( "Test/pos/crop001501e.png" );
-//        posFiles.push_back( "Test/pos/crop001501f.png" );
-//        posFiles.push_back( "Test/pos/crop001501g.png" );
-//        posFiles.push_back( "Test/pos/crop001501h.png" );
-//        posFiles.push_back( "Test/pos/crop001504a.png" );
-//        posFiles.push_back( "Test/pos/crop001504b.png" );
-//        posFiles.push_back( "Test/pos/crop001504c.png" );
-//        posFiles.push_back( "Test/pos/crop001504d.png" );
-
-    vector< string > negFiles;
-    negFiles.push_back( "neg1.png" );
-    negFiles.push_back( "neg2.png" );
-    negFiles.push_back( "neg3.png" );
-    negFiles.push_back( "neg4.png" );
-//        negFiles.push_back( "Test/neg/00001147.png" );
-//        negFiles.push_back( "Test/neg/00001148.png" );
-//        negFiles.push_back( "Test/neg/00001149.png" );
-//        negFiles.push_back( "Test/neg/00001150.png" );
-//        negFiles.push_back( "Test/neg/00001153.png" );
-
-    vector< string > testFiles;
-    testFiles.push_back( "test.png" );
-    testFiles.push_back( "test2.png" );
-    testFiles.push_back( "test3.png" );
-    testFiles.push_back( "test4.png" );
-    testFiles.push_back( "neg1.png" );
-    testFiles.push_back( "neg2.png" );
-    testFiles.push_back( "neg3.png" );
-    testFiles.push_back( "neg4.png" );
-    testFiles.push_back( "Test/pos/crop001501c.png" );
-    testFiles.push_back( "Test/pos/crop001501d.png" );
-    testFiles.push_back( "Test/pos/crop001501e.png" );
-    testFiles.push_back( "Test/pos/crop001501f.png" );
-    testFiles.push_back( "Test/neg/00001150.png" );
-    testFiles.push_back( "Test/neg/00001153.png" );
-    testFiles.push_back( "Test/pos/crop001504d.png" );
-    testFiles.push_back( "Test/pos/crop001511a.png" );
-    testFiles.push_back( "Test/pos/crop001511b.png" );
-
-//    for( size_t i = 0; i < posFiles.size(); i++ )
-//    {
-//        Mat pos = imread( posFiles[ i ].c_str() );
-//        detector.addTrainingImage( pos, true, true );
-////            Mat flipped;
-////            flip( pos, flipped, 1 );
-////            detector.addTrainingImage( flipped, true, true );
-//
-//    }
-//
-//    for( size_t i = 0; i < negFiles.size(); i++ )
-//    {
-//        Mat neg = imread( negFiles[ i ].c_str() );
-//        detector.addTrainingImage( neg, false, true );
-////            Mat flipped;
-////            flip( neg, flipped, 1 );
-////            detector.addTrainingImage( flipped, false, true );
-//    }
-
-//    detector.train();
-//
-//    for( size_t i = 0; i < testFiles.size(); i++ )
-//    {
-//        Mat test = imread( testFiles[ i ].c_str() );
-//        detector.classify( test, true );
-//    }
 
     return 0;
 }

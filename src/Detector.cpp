@@ -16,12 +16,13 @@ Detector::Detector( void )
           mShouldIgnoreSign( true )
 {
     mSvmParameters.svm_type = CvSVM::C_SVC;
-    mSvmParameters.C = 0.1;
-    mSvmParameters.kernel_type = CvSVM::LINEAR;
-    mSvmParameters.term_crit = cvTermCriteria( CV_TERMCRIT_ITER, 10000, 1e-6 );
+    mSvmParameters.C = pow( 2, 5 );
+    mSvmParameters.gamma = pow( 2, -5 );
+    mSvmParameters.kernel_type = CvSVM::RBF;
+    mSvmParameters.term_crit = cvTermCriteria( CV_TERMCRIT_ITER, 100000, 1e-6 );
 }
 
-void Detector::addTrainingFile( const string& fileName, const bool shouldShouldHogImages )
+void Detector::addTrainingFile( const string& fileName, const bool shouldShowHogImages )
 {
     vector< string > posFiles;
     vector< string > negFiles;
@@ -56,39 +57,51 @@ void Detector::addTrainingFile( const string& fileName, const bool shouldShouldH
     {
         Mat pos = imread( posFiles[ i ].c_str() );
         printf( "Adding positive training image: %s\n", posFiles[ i ].c_str() );
-        addTrainingImage( pos, true, shouldShouldHogImages );
+        addTrainingImage( pos, true, shouldShowHogImages );
     }
     for( size_t i = 0; i < negFiles.size(); i++ )
     {
         Mat neg = imread( negFiles[ i ].c_str() );
         printf( "Adding negative training image: %s\n", negFiles[ i ].c_str() );
-        addTrainingImage( neg, false, shouldShouldHogImages );
+        addTrainingImage( neg, false, shouldShowHogImages );
+        Mat mirror;
+        flip( neg, mirror, 1 );
+        addTrainingImage( neg, false, shouldShowHogImages );
     }
 }
 
 void Detector::addTrainingImage( const cv::Mat& image, bool isPositive, bool shouldShowHogImage )
 {
-    // create grid of HOG cells
-    Grid grid( cropToDetectionWindow( image ), mCellDims, mNumBins, mShouldIgnoreSign );
+	for ( int y = 0; y < image.rows - mDetectionWindow[ 1 ]; y += mDetectionWindow[ 1 ] )
+	{
+		for ( int x = 0; x < image.cols - mDetectionWindow[ 0 ]; x += mDetectionWindow[ 0 ] )
+		{
+			Rect roi( x, y, mDetectionWindow[ 0 ], mDetectionWindow[ 1 ] );
+			Mat croppedImage = image( roi );
 
-    // create hogImage
-    if( shouldShowHogImage )
-    {
-        Mat hog = grid.createHogImage( 5 );
-        show( hog, ( isPositive ? "+" : "-" ) );
-        waitKey();
-    }
+			// create grid of HOG cells
+			Grid grid( croppedImage, mCellDims, mNumBins, mShouldIgnoreSign );
 
-    // compute descriptors
-    const vector< Mat >& descriptorVector = grid.getDescriptorVectors();
-    for( size_t i = 0; i < descriptorVector.size(); i++ )
-    {
-        mDescriptorVectors.push_back( descriptorVector[ i ] );
-        mDescriptorVectorLabels.push_back( isPositive );
-    }
+			// create hogImage
+			if( shouldShowHogImage )
+			{
+				Mat hog = grid.createHogImage( 5 );
+				show( hog, ( isPositive ? "+" : "-" ) );
+				waitKey();
+			}
+
+			// compute descriptors
+			const vector< Mat >& descriptorVector = grid.getDescriptorVectors();
+			for( size_t i = 0; i < descriptorVector.size(); i++ )
+			{
+				mDescriptorVectors.push_back( descriptorVector[ i ] );
+				mDescriptorVectorLabels.push_back( isPositive );
+			}
+		}
+	}
 }
 
-float Detector::classify( const cv::Mat& image, const bool shouldShowHogImage )
+double Detector::classify( const cv::Mat& image, const bool shouldShowHogImage )
 {
     printf( "Loading SVM state...\n" );
     {
@@ -110,10 +123,10 @@ float Detector::classify( const cv::Mat& image, const bool shouldShowHogImage )
     double predictSum = 0;
     for( size_t i = 0; i < descriptorVector.size(); i++ )
     {
-        const float predict = mSvm.predict( descriptorVector[ i ] );
+        const double predict = mSvm.predict( descriptorVector[ i ] );
         predictSum += predict;
     }
-    const float predict = predictSum / descriptorVector.size();
+    const double predict = predictSum / descriptorVector.size();
 
     // create hogImage
     if( shouldShowHogImage )
@@ -178,4 +191,5 @@ void Detector::train( void )
     printf( "Training SVM...\n" );
     mSvm.train( descriptors, labels, Mat(), Mat(), mSvmParameters );
     mSvm.save( SVM_FILENAME.c_str() );
+    printf( "DONE\n" );
 }

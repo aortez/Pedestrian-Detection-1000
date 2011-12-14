@@ -45,7 +45,7 @@ TEST_FIXTURE( CellFixture, angleToBinIndex_ignoreSignTrue )
 
     const int numBins = 5;
 
-    int computedBin[ 3 ];
+    int computedBin[ 4 ];
     computedBin[ 0 ] = CellFixture::angleToBinIndex( angle[ 0 ], numBins, true );
     computedBin[ 1 ] = CellFixture::angleToBinIndex( angle[ 1 ], numBins, true );
     computedBin[ 2 ] = CellFixture::angleToBinIndex( angle[ 2 ], numBins, true );
