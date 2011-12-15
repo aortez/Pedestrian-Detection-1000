@@ -5,6 +5,7 @@
 \usepackage{fancybox}
 \usepackage{listings}
 \usepackage{multicol}
+\usepackage{graphicx}
 \title{Human Pedestrian Detection using Histograms of Oriented Gradients}
 \author{Allan Ortiz and Brad Seefield\\
 	CSS 587}
@@ -31,7 +32,7 @@ To understand the importance of the preceding work we will briefly discuss some 
     The goal of their work was to detect and recognize various classes of objects (faces, automobiles and 
     pedestrians for this experiment). They use Haar Wavelets to “describe an object class in terms of a 
     large set of local oriented intensity differences between adjacent regions.”
-  \item Gavrila et al\cite{Garvri04} created a real-time pedestrian detection application by extracting edge images and 
+  \item Gavrila et al\cite{Gavri04} created a real-time pedestrian detection application by extracting edge images and 
     matched them to a collection of learned examplers using the chamfer distance.
   \item SIFT based feature detection was improved upon by Ke et al\cite{Ke04} by using Principal Components Analysis 
     (PCA) instead of SIFT’s smooth weighted histograms. These PCA-based descriptors “are more distinctive, 
@@ -44,6 +45,13 @@ we could potentially arrive at a solution that produces higher performance\footn
 is more performant if it yields fewer false positives and/or a lower miss rate than another algorithm.} 
 with a simpler implementation.
 
+\end{multicols}
+\begin{figure}[t]
+  \includegraphics[scale=0.75]{processing_chain.png}
+  \caption{HOG processing pipeline}
+  \label{HOG_processing_pipeline}
+\end{figure}
+\begin{multicols}{2}
 
 \section{Approach Outline}
 The simplicity of HOGs is that there are no key-points to identify. HOG descriptors are produced from a dense grid 
@@ -53,9 +61,8 @@ blocks. The blocks are normalized by accumulating the local histogram energy and
 of the cells in the block. These normalized blocks are what become the Histogram of Oriented Gradient descriptors.
 The blocks are overlapped across the detection window so that cells are used multiple times in different 
 contexts (we discuss the benefits of this in the results section). The feature vectors are then fed into an 
-SVM where a person/non-person classification is made. An overview of the pipeline is shown in figure 1. 
-
-INSERT HOG processing pipeline here ************************************
+SVM where a person/non-person classification is made. An overview of the pipeline is shown in 
+figure \ref{HOG_processing_pipeline}. 
 
 Dalal et el's experiments showed that color normalization had a small affect on performance. 
 In our implementation we used gray scale which had slightly lesser performance than RGB, 
@@ -77,8 +84,8 @@ a block that yields the correct descriptors for a positive human detection inclu
 The first block may only include the shoulder, but a subsequent block may include both the should and elbow.
 
 Lastly, but most importantly, Dalal et al showed that HOGs is more performant than the existing methods 
-discussed; in some cases, 10-100 times better. They remark that this is “because none of the key-point 
-detectors that we are aware of detect human body structures reliably.” Intuitively, this makes sense 
+discussed; in some cases, 10-100 times better. They remark that this is ``because none of the key-point 
+detectors that we are aware of detect human body structures reliably.'' Intuitively, this makes sense 
 given the wide variance of human forms. Relying on specific key-points from one human to the next would not be robust. 
 
 \section{What We Accomplished}
@@ -88,7 +95,15 @@ are some of the challenges specifically with this kind of detection. This would 
 implementation of their algorithm from scratch, training an SVM and running the experiment with the 
 various parameters (e.g., block size, normalization functions, etc).
 
-\section{Implementing the Algorithm}
+\end{multicols}
+\begin{figure}[t]
+  \includegraphics[scale=0.75]{performance_vs_numbins.png}
+  \caption{Performance as Number of Orientation Bins Varies}
+  \label{NumBins-vs-Performance}
+\end{figure}
+\begin{multicols}{2}
+
+\section{Implementation}
 By design, the HOGs algorithm is not terribly complex. As stated previously, this is one of the benefits 
 over existing solutions. Contrary to how Dalal et al developed their implementation, we used 
 OpenCV wherever possible. Although writing the code was a straightforward task, verifying correctness 
@@ -131,10 +146,8 @@ so no repetitions were needed and only a minor modification was needed for each 
 part of the test is the time cost to retrain the SVM.
 
 \section{Results}
-The vast majority of the project timeline was spent in getting the algorithm to work just right 
-and ensuring correct output and training of the SVM. We did not reach a state where we could 
-perform large experiments until the final day of the project. Because of this, our results section will is limited.
-
+From our single experiment, we found similar results to those of Dalal et al: more orientation bins
+performs better than less (within the range that we tested).
 
 \section{Summary}
 The ability to automatically detect humans in a given image has vast applications. Automobiles could use 

@@ -19,7 +19,7 @@ Detector::Detector( void )
     mSvmParameters.C = pow( 2, 5 );
     mSvmParameters.gamma = pow( 2, -5 );
     mSvmParameters.kernel_type = CvSVM::RBF;
-    mSvmParameters.term_crit = cvTermCriteria( CV_TERMCRIT_ITER, 100000, 1e-6 );
+    mSvmParameters.term_crit = cvTermCriteria( CV_TERMCRIT_ITER, 1000, 1e-6 );
 }
 
 void Detector::addTrainingFile( const string& fileName, const bool shouldShowHogImages )

@@ -76,22 +76,18 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth ) const
     const int blockRadius = blockWidth / 2;
     const Range gridRangeX( blockRadius, dimX() - blockRadius );
     const Range gridRangeY( blockRadius, dimY() - blockRadius );
-//    printf( "blockWidth: %d, blockRadius: %d\n", blockWidth, blockRadius );
 
     // allocate memory for descriptor vectors
     const int numCellsPerBlock = blockWidth * blockWidth;
     vector< Mat > descriptorVectors( gridRangeX.size() * gridRangeY.size() );
 
     Mat descriptorVector( 1, numCellsPerBlock * mNumBins, CV_32FC1 );
-//    printf( "\nDescriptor size:%s\n", toString( descriptorVector ).c_str() );
 
     // visit each block and populate its descriptor vector
     for( int gridY = gridRangeY.start; gridY < gridRangeY.end; gridY++ )
     {
         for( int gridX = gridRangeX.start; gridX < gridRangeX.end; gridX++ )
         {
-//            printf( "\nBlock starting @ x,y = (%d,%d), descriptorVectorIndex: %d\n", gridX, gridY, descriptorVectorIndex );
-
             // compute the range of cells in the block
             const Range cellRangeX( gridX - blockRadius, gridX - blockRadius + blockWidth );
             const Range cellRangeY( gridY - blockRadius, gridY - blockRadius + blockWidth );
@@ -106,7 +102,6 @@ vector< Mat > Grid::createDescriptorVectors( const int blockWidth ) const
                     for( int i = 0; i < mNumBins; i++, descriptorIndex++ )
                     {
                         const float descriptorValue = cell( cellX, cellY ).bin( i );
-//                        printf( "[%d]: %f,\n ", descriptorIndex, descriptorValue );
                         descriptorVector.at< float >( 0, descriptorIndex ) = descriptorValue;
                     }
                 }
@@ -132,29 +127,24 @@ int Grid::dimY( void ) const
 const std::vector< cv::Mat >& Grid::getDescriptorVectors( void ) const
 {
     return mDescriptorVector;
-
 }
 
-void Grid::normalizeDescriptorVectors( std::vector< cv::Mat >& descriptorVectors )
+void Grid::normalizeDescriptorVectors( vector< Mat >& descriptorVectors )
 {
-    // TODO: assert descriptor of correct datatype
-
-//    printf( "\nnum descriptor vectors: %lu\n", descriptorVectors.size() );
     // normalize locally to each descriptor vector
     for( size_t descriptorVectorIndex = 0; descriptorVectorIndex < descriptorVectors.size(); descriptorVectorIndex++ )
     {
         Mat& descriptors = descriptorVectors[ descriptorVectorIndex ];
 
         // compute L2 norm for descriptor vector
-        const double epsilon = 0.0001;
-        double sumOfSquares = epsilon;
+        const double epsilon = 0.1;
+        double sumOfSquares = 0;
         for( int descriptorIndex = 0; descriptorIndex < descriptors.rows; descriptorIndex++ )
         {
             const float descriptorValue = descriptors.at< float >( 0, descriptorIndex );
             sumOfSquares += descriptorValue * descriptorValue;
-//            printf( "descriptor[%d]: %f\n", descriptorIndex, descriptorValue );
         }
-        const float l2Norm = std::sqrt( sumOfSquares );
+        const float l2Norm = std::sqrt( sumOfSquares + epsilon );
 //        printf( "L2Norm: %f\n", l2Norm );
 
         // normalize

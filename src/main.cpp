@@ -1,3 +1,5 @@
+//!\file main.cpp
+
 #include <UnitTest++.h>
 #include <cstdio>
 #include <cv.h>
