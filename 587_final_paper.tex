@@ -95,14 +95,6 @@ are some of the challenges specifically with this kind of detection. This would 
 implementation of their algorithm from scratch, training an SVM and running the experiment with the 
 various parameters (e.g., block size, normalization functions, etc).
 
-\end{multicols}
-\begin{figure}[t]
-  \includegraphics[scale=0.75]{performance_vs_numbins.png}
-  \caption{Performance as Number of Orientation Bins Varies}
-  \label{NumBins-vs-Performance}
-\end{figure}
-\begin{multicols}{2}
-
 \section{Implementation}
 By design, the HOGs algorithm is not terribly complex. As stated previously, this is one of the benefits 
 over existing solutions. Contrary to how Dalal et al developed their implementation, we used 
@@ -138,16 +130,29 @@ a configuration that took only an hour for each training), we did not have
 much time to determine the optimal SVM configuration for our application.  
 Our choice of SVM parameters is thus unlikely to be optimal.
 
+\end{multicols}
+\begin{figure}[t]
+  \includegraphics[scale=0.75]{performance_vs_numbins.png}
+  \caption{Performance as Number of Orientation Bins Varies}
+  \label{NumBins-vs-Performance}
+\end{figure}
+\begin{multicols}{2}
+
 \section{Experimental Method}
-The one experiment that we had time to conduct was to vary the number of orientation bins.  
-Because varying the number of bins modifies the descriptors generated, we needed to retrain 
-the SVM between tests.  Performing the experiment was straightforward:  our system is deterministic 
-so no repetitions were needed and only a minor modification was needed for each test.  The difficult 
-part of the test is the time cost to retrain the SVM.
+The majority of the project timeline was spent in getting the algorithm to 
+work just right and ensuring correct output and training of the SVM. We did 
+not reach a state where we could perform large experiments until the final 
+day of the project. Because of this, our results section is limited.
 
 \section{Results}
-From our single experiment, we found similar results to those of Dalal et al: more orientation bins
-performs better than less (within the range that we tested).
+The one experiment that we had time to conduct was to vary the number of orientation bins.
+Because varying the number of bins modifies the descriptors generated, we needed to 
+retrain the SVM between tests.  Performing the experiment was straightforward:  our 
+system is deterministic so no repetitions were needed and only a minor modification 
+was needed for each test.  The difficult part of the test was the time cost to retrain the SVM.
+
+As can be seen in figure \ref{NumBins-vs-Performance}, nine bins was found to be the most optimal. This is inline with 
+the results that Dalal et al concluded with.
 
 \section{Summary}
 The ability to automatically detect humans in a given image has vast applications. Automobiles could use 
