@@ -72,9 +72,9 @@ void Detector::addTrainingFile( const string& fileName, const bool shouldShowHog
 
 void Detector::addTrainingImage( const cv::Mat& image, bool isPositive, bool shouldShowHogImage )
 {
-	for ( int y = 0; y < image.rows - mDetectionWindow[ 1 ]; y += mDetectionWindow[ 1 ] )
+	for ( int y = 0; y <= image.rows - mDetectionWindow[ 1 ]; y += mDetectionWindow[ 1 ] )
 	{
-		for ( int x = 0; x < image.cols - mDetectionWindow[ 0 ]; x += mDetectionWindow[ 0 ] )
+		for ( int x = 0; x <= image.cols - mDetectionWindow[ 0 ]; x += mDetectionWindow[ 0 ] )
 		{
 			Rect roi( x, y, mDetectionWindow[ 0 ], mDetectionWindow[ 1 ] );
 			Mat croppedImage = image( roi );
