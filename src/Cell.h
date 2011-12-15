@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-namespace cv { struct Mat; }
+namespace cv { class Mat; }
 
 class Cell
 {

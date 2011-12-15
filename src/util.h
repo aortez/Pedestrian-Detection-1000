@@ -1,10 +1,11 @@
 #pragma once
 #include <cv.h>
 #include <string>
-namespace cv { struct Mat; }
 
 void assertTrue( bool truthVal, const std::string& errMsg );
 
+double round( double r );
+                         
 void show(
         const cv::Mat& img,
         const std::string& windowName,

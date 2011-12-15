@@ -12,8 +12,12 @@ void assertTrue( const bool truthVal, const std::string& errMsg )
     }
 }
 
-void show(
-        const Mat& img,
+double round( const double r )
+{
+    return ( r > 0.0 ) ? floor( r + 0.5 ) : ceil( r - 0.5 );
+}
+
+void show( const Mat& img,
         const string& windowName,
         const int scale,
         const int interpolation_type )

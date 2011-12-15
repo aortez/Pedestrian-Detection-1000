@@ -30,7 +30,7 @@ void Cell::addImage( const cv::Mat& src )
         for( int x = 0; x < src.cols; x++ )
         {
             const Vec2d vec( gradient_horz.at< float >( y, x ), gradient_vert.at< float >( y, x ) );
-            const float mag = norm( vec );
+            const float mag = static_cast<float>( norm( vec ) );
             const double angle = atan2( static_cast<double>( vec[ 1 ] ), static_cast<double>( vec[ 0 ] ) );
             addPixel( angle, mag );
         }
@@ -124,7 +124,9 @@ Mat Cell::drawHOG( int cellScale ) const
     {
         const float magnitude = binNormalized( binIndex ) * magnitudeScalar;
         const double angle = binAngle( binIndex );
-        Point end( center.x + cos( angle ) * magnitude, center.y + sin( angle ) * magnitude );
+        Point end( 
+            static_cast<int>( center.x + cos( angle ) * magnitude ), 
+            static_cast<int>( center.y + sin( angle ) * magnitude ) );
         line( out, center, end, color );
     }
 
